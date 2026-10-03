@@ -8,9 +8,9 @@ export default function Home() {
 
   //Objects
   const defaultContacts = [
-  { name: 'Gabriel', phone: '11999999999' },
-  { name: 'Rafael', phone: '11999999998' },
-  { name: 'Caio', phone: '11999999997' }
+  { id: 'lkdjasd', name: 'Gabriel', phone: '11999999999' },
+  { id: 'lkgrasd', name: 'Rafael', phone: '11999999998' },
+  { id: 'lkfadsf', name: 'Caio', phone: '11999999997' }
 ]
 
   //States
@@ -20,18 +20,6 @@ export default function Home() {
   const [error, setError] = useState('')
 
   //Functions
-  const createContactList = () =>{
-    const newList = contacts.map((contact)=>{
-        return <Contact
-          key={contact.phone}
-          name={contact.name}
-          phone={contact.phone}
-        />
-      })
-
-    return newList
-  }
-
   const createNewContact = (event) =>{
 
     event.preventDefault()
@@ -50,6 +38,7 @@ export default function Home() {
     setError('')
 
     const newContact = {
+      id: Date.now(),
       name: newName,
       phone: newPhone
     }
@@ -58,6 +47,35 @@ export default function Home() {
     setNewName('')
     setNewPhone('')
   }
+  const deleteContact = (id) =>{
+    const newList = contacts.filter((contact) => contact.id !== id)
+    setContacts(newList)
+  }  
+  const editContact = (id) =>{
+    const newList = contacts.map(contact =>{
+      if (contact.id === id){
+        return {...contact, name:'edited'}
+      }
+      else return contact
+    })
+    setContacts(newList) 
+  }
+  const createContactList = () =>{
+    const newList = contacts.map((contact)=>{
+        return <Contact
+          id = {contact.id}
+          key={contact.id}
+          name={contact.name}
+          phone={contact.phone}
+          onDelete={deleteContact}
+        />
+      })
+
+    return newList
+  }  
+
+
+
 
 
   return (
