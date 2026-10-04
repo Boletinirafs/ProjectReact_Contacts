@@ -8,9 +8,9 @@ export default function Home() {
 
   //Objects
   const defaultContacts = [
-  { id: 'lkdjasd', name: 'Gabriel', phone: '11999999999' },
-  { id: 'lkgrasd', name: 'Rafael', phone: '11999999998' },
-  { id: 'lkfadsf', name: 'Caio', phone: '11999999997' }
+  { id: (Date.now()+1), name: 'Gabriel', phone: '11999999999' },
+  { id: (Date.now()+2), name: 'Rafael', phone: '11999999998' },
+  { id: (Date.now()+3), name: 'Caio', phone: '11999999997' }
 ]
 
   //States
@@ -18,25 +18,55 @@ export default function Home() {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [error, setError] = useState('')
+  const [editingId, setEditingId] = useState(null)
 
   //Functions
   const createNewContact = (event) =>{
 
     event.preventDefault()
 
+    //Field validation
     if (!newName || !newPhone){
       console.log('Empty name and/or phone field')
       setError('Name and phone are required')
       return
     } 
 
-    if (contacts.some(contact => contact.phone === newPhone)){
-      setError('This phone number already exists')
+    //Editing verification
+    if (editingId !== null){
+
+      const phoneAlreadyExists = contacts.some(
+        contact => contact.phone === newPhone && contact.id !== editingId
+      )
+
+      if (phoneAlreadyExists) {
+        setError('Phone already exists')
+        return
+      }
+
+      const newList = contacts.map(contact =>{
+
+        if(contact.id === editingId){
+
+          return {...contact,name:newName,phone:newPhone}
+
+        }else return contact
+      }) 
+      setContacts(newList)
+      setNewName('')
+      setNewPhone('')
+      setEditingId(null)
+      setError('')
       return
     }
 
-    setError('')
+    //Existing phone message
+    if (contacts.some(contact => contact.phone === newPhone)){
+      setError('This phone number already exists')
+      return
+    }setError('')
 
+    //New contact creation
     const newContact = {
       id: Date.now(),
       name: newName,
@@ -52,13 +82,12 @@ export default function Home() {
     setContacts(newList)
   }  
   const editContact = (id) =>{
-    const newList = contacts.map(contact =>{
-      if (contact.id === id){
-        return {...contact, name:'edited'}
-      }
-      else return contact
-    })
-    setContacts(newList) 
+    setEditingId(id)
+    const contactToEdit = contacts.find(contact => contact.id === id)
+    console.log(contactToEdit)
+
+    setNewName(contactToEdit.name)
+    setNewPhone(contactToEdit.phone)
   }
   const createContactList = () =>{
     const newList = contacts.map((contact)=>{
@@ -68,6 +97,7 @@ export default function Home() {
           name={contact.name}
           phone={contact.phone}
           onDelete={deleteContact}
+          onEdit={editContact}
         />
       })
 
