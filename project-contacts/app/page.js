@@ -2,7 +2,8 @@
 
 //Imports
 import { Contact } from './components/contact'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function Home() {
 
@@ -19,6 +20,11 @@ export default function Home() {
   const [newPhone, setNewPhone] = useState('')
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState(null)
+
+  //Effects
+  useEffect(()=>{
+    loadContacts()
+  },[])
 
   //Functions
   const createNewContact = (event) =>{
@@ -104,6 +110,20 @@ export default function Home() {
     return newList
   }  
 
+  const loadContacts = async () => {
+
+    try{
+      
+    const response = await axios.get('https://6a09e163e7e3f433d483897d.mockapi.io/rafa/test')
+    const data = response.data 
+    console.log(`Refreshing API - ${new Date().toLocaleTimeString()}`)
+    setContacts(data)
+
+    }catch(error){
+      console.log(error)
+    }
+  }
+
 
 
 
@@ -117,6 +137,8 @@ export default function Home() {
         <input placeholder='Type your Phone Number' value={newPhone} onChange={(event) => setNewPhone(event.target.value)}/>
         {error && <p>{error}</p>} 
       </form>
+
+      <button onClick={loadContacts}>LOAD API</button>
 
       {createContactList()}
 
